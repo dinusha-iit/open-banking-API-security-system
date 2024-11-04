@@ -1,0 +1,399 @@
+{
+	"info": {
+		"_postman_id": "c57019a3-c830-45fd-8d06-0130825a0675",
+		"name": "Mobile Backend - EnergyCorp",
+		"description": "## Introduction\n\nInvoking ERC 1155 chain code via fab connect API. This is associated with MO2 peer node.\n\nEnergy Corp Endpoint: [https://u0p993lt2x-u0su1x5wb2-connect.us0-aws-ws.kaleido.io](https://u0p993lt2x-u0su1x5wb2-connect.us0-aws-ws.kaleido.io)\n\n## APIs to Invoke\n\nTo invoke below API Authorization header needs to be provided. And currently Basic authorisation is used for this.\n\nAll the api calls except identities and enrol, should have below header section in the request body, which represents the caller entity. In this case, it is Mobile Backend.\n\n`\"headers\": { \"signer\": \"MBL_BKND_USER\", \"channel\": \"default-channel\", \"chaincode\": \"erc1155\" }`\n\n### Create Identity\n\nPOST: /identities\n\nCreate identities for each electricity customer. Once this API is invoked, it will return a secret, that should be used in below enrol API to get the user enrolled in the chain code.\n\n### Enrol Identity\n\nPOST: /identities/{user}/enroll\n\nUser get enrolled to the chain code in order to do relevant transactions. username should be passed as a path param, and secret returned in above identity call needs to be sent in the body.\n\n### Transfer\n\nPOST: /transactions\n\nThis API get invoked in below scenarios,\n\n1.  YLEM Points Transfer - The FIAT transfers when placing a primary trade requests.\n2.  Energy Token Transfer - For secondary trade requests. (Selling the tokens owned by a user)\n    \n\n`\"func\": \"TransferFrom\", \"args\": [ \"FROM_USER\", \"TO_USER\", \"TOKEN_ID\", \"AMOUNT\" ]`\n\nTODO : Order details must be sent through a message. Fabric private data collections can be used for this. And this is yet to be implemented.\n\n### Balance Of\n\nPOST: /query\n\nThis is used to get the balance of each token in the user account.\n\n`\"func\": \"BalanceOf\", \"args\": [ \"USER\", \"TOKEN_ID\" ]`\n\n### Balance Of Batch\n\nThis is used to get the balance of token array against the given user array.\n\n`\"func\": \"BalanceOfBatch\", \"args\":[ \"[\\\"USER_1\\\",\\\"USER_2\\\"]\",\"[TOKEN_ID_1,TOKEN_ID_2]\"]`\n\n### External App Credentials\n\n**Name**: ws-cred\n\nfor EC_Peer1 (Node)\n\n**Peer**\n\n[https://u0rilfx367:BBQtWxxOTXetdMpndbDHnJdnuIpfqx3r0Ynk2X8PYqw@u0p993lt2x-u0su1x5wb2-peer.us0-aws-ws.kaleido.io/](https://u0rilfx367:BBQtWxxOTXetdMpndbDHnJdnuIpfqx3r0Ynk2X8PYqw@u0p993lt2x-u0su1x5wb2-peer.us0-aws-ws.kaleido.io/)\n\n**Blockchain Explorer**\n\n[https://u0rilfx367:BBQtWxxOTXetdMpndbDHnJdnuIpfqx3r0Ynk2X8PYqw@u0p993lt2x-u0su1x5wb2-explorer.us0-aws-ws.kaleido.io/](https://u0rilfx367:BBQtWxxOTXetdMpndbDHnJdnuIpfqx3r0Ynk2X8PYqw@u0p993lt2x-u0su1x5wb2-explorer.us0-aws-ws.kaleido.io/)\n\n**API Gateway (REST)**\n\n[https://u0rilfx367:BBQtWxxOTXetdMpndbDHnJdnuIpfqx3r0Ynk2X8PYqw@u0p993lt2x-u0su1x5wb2-connect.us0-aws-ws.kaleido.io/](https://u0rilfx367:BBQtWxxOTXetdMpndbDHnJdnuIpfqx3r0Ynk2X8PYqw@u0p993lt2x-u0su1x5wb2-connect.us0-aws-ws.kaleido.io/)\n\n**WS**\n\nwss://u0rilfx367:[BBQtWxxOTXetdMpndbDHnJdnuIpfqx3r0Ynk2X8PYqw@u0p993lt2x-u0su1x5wb2-connect.us0-aws-ws.kaleido.io](mailto:BBQtWxxOTXetdMpndbDHnJdnuIpfqx3r0Ynk2X8PYqw@u0p993lt2x-u0su1x5wb2-connect.us0-aws-ws.kaleido.io)/\n\n**WSCAT Command**\n\n`wscat -c {ws_url}/ws`\n\nTo read next\n\n`{\"type\":\"listen\", \"topic\":\"topic_name\"}`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5747093"
+	},
+	"item": [
+		{
+			"name": "/identities",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"ec_user10\",\n  \"type\": \"client\",\n  \"maxEnrollments\": 0,\n  \"attributes\": {}\n}"
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/identities",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"identities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/enroll",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"secret\": \"BrfIOiyFJTkd\"\n}"
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/identities/ig-test1/enroll",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"identities",
+						"ig-test1",
+						"enroll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/Query - BalanceOf",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"headers\": {\n    \"signer\": \"ec_admin\",\n    \"channel\": \"default-channel\",\n    \"chaincode\": \"erc1155\"\n  },\n  \"func\": \"BalanceOf\",\n  \"args\": [\n      \"ec_user01\", \"7777\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/query",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/Query - BalanceOfBatch",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"headers\": {\n    \"signer\": \"ec_admin\",\n    \"channel\": \"default-channel\",\n    \"chaincode\": \"erc1155\"\n  },\n  \"func\": \"BalanceOfBatch\",\n  \"args\":[\n      \"[\\\"ec_user01\\\",\\\"ec_user02\\\",\\\"ec_user03\\\",\\\"ec_user04\\\",\\\"ec_user05\\\",\\\"ec_user06\\\",\\\"ec_user07\\\",\\\"ec_user08\\\",\\\"ec_user09\\\",\\\"ec_user10\\\"]\",\n      \"[7777,7777,7777,7777,7777,7777,7777,7777,7777,7777]\"\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/query",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/transactions-TransferFrom",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"headers\": {\n    \"signer\": \"ec_admin\",\n    \"channel\": \"default-channel\",\n    \"chaincode\": \"erc1155\"\n  },\n  \"func\": \"TransferFrom\",\n  \"args\": [\n      \"user05291\",\"user05292\",\"500202205\", \"30\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/transactions",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/eventstreams - CreateEventStream",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"test_mb_es_1\",\n  \"type\": \"websocket\",\n  \"websocket\": {\n    \"topic\": \"test_mb_tpoic_1\",\n    \"distributionMode\": \"broadcast\"\n  },\n  \"batchSize\": 1,\n  \"batchTimeoutMS\": 5000,\n  \"errorHandling\": \"skip\",\n  \"retryTimeoutSec\": 0,\n  \"blockedRetryDelaySec\": 0,\n  \"timestamps\": false,\n  \"timestampCacheSize\": 1000\n}"
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/eventstreams",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"eventstreams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/eventstreams - Get All",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/eventstreams",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"eventstreams"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/subscriptions - Create Subscription",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"sub1_test_mb_tpoic_1\",\n  \"stream\": \"es-6093766d-1053-478c-4fdc-dbe8b988c335\",\n  \"channel\": \"default-channel\",\n  \"signer\": \"ec_admin\",\n  \"fromBlock\": \"0\",\n  \"payloadType\": \"json\",\n  \"filter\": {\n    \"blockType\": \"tx\",\n    \"chaincodeId\": \"erc1155\"\n  }\n}"
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/subscriptions",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"subscriptions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/eventstreams - Get All Subscriptions",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{MobileBckendEp}}/subscriptions",
+					"host": [
+						"{{MobileBckendEp}}"
+					],
+					"path": [
+						"subscriptions"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "MobileBckendEp",
+			"value": "https://u0p993lt2x-u0su1x5wb2-connect.us0-aws-ws.kaleido.io",
+			"type": "string"
+		},
+		{
+			"key": "BASIC_AUTH",
+			"value": "dTBpeWxudjhzODpDVDRZeEtxb3lMNDd4dllTVGs2MnV0TGhQMXpSbG9XbGJtSUtQanRoMWY0",
+			"type": "string"
+		}
+	]
+}

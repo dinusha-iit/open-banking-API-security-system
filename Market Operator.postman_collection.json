@@ -1,0 +1,273 @@
+{
+	"info": {
+		"_postman_id": "39bda63c-3cb6-48da-a902-f3da384b264b",
+		"name": "Market Operator",
+		"description": "## Introduction\n\nInvoking ERC 1155 chain code via fab connect API. This is associated with MO2 peer node.\n\nMarket Operator Endpoint: https://u0p993lt2x-u0et1b901q-connect.us0-aws-ws.kaleido.io\n\n## APIs to Invoke\n\nTo invoke below API Authorization header needs to be provided. And currently Basic authorisation is used for this.\n\nAll the api calls except identities and enrol, should have below header section in the request body, which represents the caller entity. In this case, it is Market Operator.\n\n`\"headers\": { \"signer\": \"MBL_BKND_USER\", \"channel\": \"default-channel\", \"chaincode\": \"erc1155\" }`\n\n### Mint\n\nPOST: /transaction\n\nFor every successful order fulfilment of the matching engine, two types of tokens must be minted in the same quantity, and must be transferred to users as given in the matching engine response.\n\n`\"func\": \"Mint\", \"args\": [ \"USER\", \"TOKEN_IDD\", \"AMOUNT\" ],`\n\n### Transfer\n\nPOST: /transactions\n\nThis may be used in case of failure in matching process, when the transferred tokens (YLEM_Points) needs to be refunded.\n\n`\"func\": \"TransferFrom\", \"args\": [ \"FROM_USER\", \"TO_USER\", \"TOKEN_ID\", \"AMOUNT\" ]`\n\nTODO : Refund details must be sent through a message. Fabric private data collections can be used for this. And this is yet to be implemented.\n\n### Balance Of\n\nPOST: /query\n\nThis is used to get the balance of each token in the user account.\n\n`\"func\": \"BalanceOf\", \"args\": [ \"USER\", \"TOKEN_ID\" ]`\n\n### Balance Of Batch\n\nThis is used to get the balance of token array against the given user array.\n\n`\"func\": \"BalanceOfBatch\", \"args\":[ \"[\\\"USER_1\\\",\\\"USER_2\\\"]\",\"[TOKEN_ID_1,TOKEN_ID_2]\"]`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5747093"
+	},
+	"item": [
+		{
+			"name": "/identities",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"mo_admin\",\n  \"type\": \"client\",\n  \"maxEnrollments\": 0,\n  \"attributes\": {}\n}"
+				},
+				"url": {
+					"raw": "{{MarketOpEndpoint}}/identities",
+					"host": [
+						"{{MarketOpEndpoint}}"
+					],
+					"path": [
+						"identities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/enroll",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"secret\": \"FAAaQQXyOrlo\"\n}"
+				},
+				"url": {
+					"raw": "{{MarketOpEndpoint}}/identities/mo_admin/enroll",
+					"host": [
+						"{{MarketOpEndpoint}}"
+					],
+					"path": [
+						"identities",
+						"mo_admin",
+						"enroll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/transactions-Mint",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"headers\": {\n    \"type\": \"SendTransaction\",\n    \"signer\": \"mo_admin\",\n    \"channel\": \"default-channel\",\n    \"chaincode\": \"erc1155\"\n  },\n  \"func\": \"Mint\",\n  \"args\": [\n    \"ec_user09\", \"2001\", \"100\"\n  ],\n  \"init\": false\n}"
+				},
+				"url": {
+					"raw": "{{MarketOpEndpoint}}/transactions",
+					"host": [
+						"{{MarketOpEndpoint}}"
+					],
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/transactions-TransferFrom",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"headers\": {\n    \"signer\": \"user05281\",\n    \"channel\": \"default-channel\",\n    \"chaincode\": \"erc1155\"\n  },\n  \"func\": \"TransferFrom\",\n  \"args\": [\n      \"user05291\",\"user05292\",\"500202205\", \"30\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{MarketOpEndpoint}}/transactions",
+					"host": [
+						"{{MarketOpEndpoint}}"
+					],
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/Query - BalanceOf",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"headers\": {\n    \"signer\": \"user05281\",\n    \"channel\": \"default-channel\",\n    \"chaincode\": \"erc1155\"\n  },\n  \"func\": \"BalanceOf\",\n  \"args\": [\n      \"ec_user01\", \"1001\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{MarketOpEndpoint}}/query",
+					"host": [
+						"{{MarketOpEndpoint}}"
+					],
+					"path": [
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/Query - BalanceOfBatch",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic {{BASIC_AUTH}}"
+					},
+					{
+						"key": "MINTER_ORG_MSPID",
+						"value": "Org1MSP",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"headers\": {\n    \"signer\": \"user05281\",\n    \"channel\": \"default-channel\",\n    \"chaincode\": \"erc1155\"\n  },\n  \"func\": \"BalanceOfBatch\",\n  \"args\":[\n      \"[\\\"ec_user01\\\",\\\"ec_user01\\\",\\\"ec_user02\\\",\\\"ec_user02\\\",\\\"ec_user03\\\",\\\"ec_user03\\\",\\\"ec_user04\\\",\\\"ec_user04\\\",\\\"ec_user05\\\",\\\"ec_user05\\\",\\\"ec_user06\\\",\\\"ec_user06\\\",\\\"ec_user07\\\",\\\"ec_user07\\\",\\\"ec_user08\\\",\\\"ec_user08\\\",\\\"ec_user09\\\",\\\"ec_user09\\\",\\\"ec_user10\\\",\\\"ec_user10\\\"]\",\n      \"[1001,2001,1001,2001,1001,2001,1001,2001,1001,2001,1001,2001,1001,2001,1001,2001,1001,2001,1001,2001]\"\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{MarketOpEndpoint}}/query",
+					"host": [
+						"{{MarketOpEndpoint}}"
+					],
+					"path": [
+						"query"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "MarketOpEndpoint",
+			"value": "https://u0p993lt2x-u0et1b901q-connect.us0-aws-ws.kaleido.io",
+			"type": "string"
+		},
+		{
+			"key": "BASIC_AUTH",
+			"value": "dTB1ZGNtcmFkYTpMdFhQWktnM1AyV1FjSFhFLUNuclcxUHRwSm9OanpYQ0xXUHg4NjRhejFZ",
+			"type": "string"
+		}
+	]
+}
